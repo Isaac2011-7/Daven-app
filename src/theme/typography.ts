@@ -7,6 +7,11 @@ import { fontFamily } from "./fonts";
  * cases from AGENTS.md (e.g. Animated.View, dynamic styles).
  */
 export const typeScale = {
+  hero: {
+    fontFamily: fontFamily.unbounded,
+    fontSize: 46,
+    lineHeight: 46,
+  },
   display: {
     fontFamily: fontFamily.unbounded,
     fontSize: 38,

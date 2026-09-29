@@ -11,12 +11,16 @@
    * --------------------------------------------------------------------- */
   --color-feather-green: #58cc02;
   --color-feather-green-lip: #58a700;
+  --color-feather-green-light: #e1f6d3;
   --color-macaw-blue: #1cb0f6;
   --color-macaw-blue-lip: #1899d6;
+  --color-macaw-blue-light: #ddf1fe;
   --color-fox-orange: #ff9600;
   --color-fox-orange-lip: #e08400;
+  --color-fox-orange-light: #fee7d3;
   --color-bee-yellow: #ffc800;
   --color-bee-yellow-lip: #e0a800;
+  --color-bee-yellow-light: #fdf0d3;
 
   /* Semantic colors */
   --color-success: #58cc02;
@@ -52,6 +56,8 @@
    * against the paired font-size into the absolute number React Native's
    * `lineHeight` style requires.
    * --------------------------------------------------------------------- */
+  --text-hero: 46px; /* Onboarding wordmark */
+  --text-hero--line-height: 1;
   --text-display: 38px; /* Hero, results */
   --text-display--line-height: 1;
   --text-h1: 26px; /* Screen title */
