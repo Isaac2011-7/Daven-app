@@ -1,0 +1,93 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
+
+@import "nativewind/theme";
+
+@theme {
+  /* ---------------------------------------------------------------------
+   * Brand colors — primary palette, each with a darker "lip" shade used
+   * for the 3D pressed-button shadow (see the btn-lip-* utilities below).
+   * --------------------------------------------------------------------- */
+  --color-feather-green: #58cc02;
+  --color-feather-green-lip: #58a700;
+  --color-macaw-blue: #1cb0f6;
+  --color-macaw-blue-lip: #1899d6;
+  --color-fox-orange: #ff9600;
+  --color-fox-orange-lip: #e08400;
+  --color-bee-yellow: #ffc800;
+  --color-bee-yellow-lip: #e0a800;
+
+  /* Semantic colors */
+  --color-success: #58cc02;
+  --color-close: #ffc800;
+  --color-streak: #ff9600;
+  --color-error: #ff4b4b;
+  --color-listening: #1cb0f6;
+
+  /* Neutrals */
+  --color-headings: #3c3c3c;
+  --color-text: #4b4b4b;
+  --color-text-2: #777777;
+  --color-disabled: #afafaf;
+  --color-border: #e5e5e5;
+  --color-background: #ffffff;
+
+  /* ---------------------------------------------------------------------
+   * Font families — React Native needs a distinct font family per weight,
+   * so each weight loaded in src/theme/fonts.ts gets its own token here.
+   * Keep these names in sync with src/theme/fonts.ts `fontFamily`.
+   * --------------------------------------------------------------------- */
+  --font-unbounded: "Unbounded_800ExtraBold";
+  --font-manrope: "Manrope_400Regular";
+  --font-manrope-medium: "Manrope_500Medium";
+  --font-manrope-semibold: "Manrope_600SemiBold";
+  --font-manrope-bold: "Manrope_700Bold";
+  --font-manrope-extrabold: "Manrope_800ExtraBold";
+  --font-heebo: "Heebo_800ExtraBold";
+
+  /* ---------------------------------------------------------------------
+   * Type scale — font-size / line-height pairs matching the design system.
+   * Line-heights are unitless ratios (e.g. 1.05), which NativeWind resolves
+   * against the paired font-size into the absolute number React Native's
+   * `lineHeight` style requires.
+   * --------------------------------------------------------------------- */
+  --text-display: 38px; /* Hero, results */
+  --text-display--line-height: 1;
+  --text-h1: 26px; /* Screen title */
+  --text-h1--line-height: 1.05;
+  --text-stat: 20px; /* Stats, numbers */
+  --text-stat--line-height: 1;
+  --text-hebrew: 34px; /* Prayer Hebrew */
+  --text-hebrew--line-height: 1.3;
+  --text-body-lg: 17px; /* Transliteration */
+  --text-body-lg--line-height: 1.5;
+  --text-body: 14px; /* Explanations */
+  --text-body--line-height: 1.5;
+  --text-label: 12px; /* Eyebrows, chips */
+  --text-label--line-height: 1.2;
+  --text-caption: 12px; /* Meta text */
+  --text-caption--line-height: 1.4;
+
+  /* Letter-spacing for eyebrow/chip labels */
+  --tracking-label: 1.4px;
+}
+
+/* -------------------------------------------------------------------------
+ * 3D "lip" shadow utilities — a Duolingo-style solid drop shadow (no blur)
+ * that gives buttons a pressable, 3D look instead of a soft glow. Pair with
+ * the matching brand background color, e.g.:
+ *   className="bg-feather-green btn-lip-green rounded-2xl"
+ * ------------------------------------------------------------------------- */
+@utility btn-lip-green {
+  box-shadow: 0 4px 0 0 var(--color-feather-green-lip);
+}
+@utility btn-lip-blue {
+  box-shadow: 0 4px 0 0 var(--color-macaw-blue-lip);
+}
+@utility btn-lip-orange {
+  box-shadow: 0 4px 0 0 var(--color-fox-orange-lip);
+}
+@utility btn-lip-yellow {
+  box-shadow: 0 4px 0 0 var(--color-bee-yellow-lip);
+}
