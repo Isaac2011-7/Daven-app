@@ -8,12 +8,16 @@ export const colors = {
   brand: {
     featherGreen: "#58CC02",
     featherGreenLip: "#58A700",
+    featherGreenLight: "#E1F6D3",
     macawBlue: "#1CB0F6",
     macawBlueLip: "#1899D6",
+    macawBlueLight: "#DDF1FE",
     foxOrange: "#FF9600",
     foxOrangeLip: "#E08400",
+    foxOrangeLight: "#FEE7D3",
     beeYellow: "#FFC800",
     beeYellowLip: "#E0A800",
+    beeYellowLight: "#FDF0D3",
   },
   semantic: {
     success: "#58CC02",
