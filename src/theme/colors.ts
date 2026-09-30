@@ -12,6 +12,7 @@ export const colors = {
     macawBlue: "#1CB0F6",
     macawBlueLip: "#1899D6",
     macawBlueLight: "#DDF1FE",
+    macawBlueBorder: "#84D8FF",
     foxOrange: "#FF9600",
     foxOrangeLip: "#E08400",
     foxOrangeLight: "#FEE7D3",
