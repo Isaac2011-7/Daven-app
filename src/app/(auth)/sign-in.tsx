@@ -18,29 +18,39 @@ export default function SignIn() {
   const { signInWith, socialError } = useSocialAuth();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [codeError, setCodeError] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSignIn = async () => {
+    if (isSubmitting) return;
     if (!email.trim()) {
       setError("Enter your email to continue.");
       return;
     }
     setError("");
-    const { error: sendError } = await signIn.emailCode.sendCode({ emailAddress: email.trim() });
-    if (sendError) {
-      setError(sendError.longMessage ?? sendError.message);
-      return;
+    setIsSubmitting(true);
+    try {
+      const { error: sendError } = await signIn.emailCode.sendCode({ emailAddress: email.trim() });
+      if (sendError) {
+        setError(sendError.longMessage ?? sendError.message);
+        return;
+      }
+      setCodeError("");
+      setIsVerifying(true);
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsVerifying(true);
   };
 
   const handleVerified = async (code: string) => {
-    setIsVerifying(false);
+    setCodeError("");
     const { error: verifyError } = await signIn.emailCode.verifyCode({ code });
     if (verifyError) {
-      setError(verifyError.longMessage ?? verifyError.message);
+      setCodeError(verifyError.longMessage ?? verifyError.message);
       return;
     }
+    setIsVerifying(false);
     const { error: finalizeError } = await signIn.finalize();
     if (finalizeError) {
       setError(finalizeError.longMessage ?? finalizeError.message);
@@ -58,6 +68,7 @@ export default function SignIn() {
         <View className="flex-1 px-8">
           <TouchableOpacity
             onPress={() => router.back()}
+            accessibilityLabel="Go back"
             hitSlop={8}
             className={`self-start ${isCompact ? "py-2" : "py-4"}`}
           >
@@ -89,9 +100,10 @@ export default function SignIn() {
           <TouchableOpacity
             activeOpacity={0.85}
             onPress={handleSignIn}
+            disabled={isSubmitting}
             className={`bg-feather-green btn-lip-green rounded-2xl items-center ${
               isCompact ? "py-3 mt-4" : "py-4 mt-6"
-            }`}
+            } ${isSubmitting ? "opacity-60" : ""}`}
           >
             <Text className="font-manrope-extrabold text-label tracking-label text-white">LOG IN</Text>
           </TouchableOpacity>
@@ -117,7 +129,7 @@ export default function SignIn() {
             />
             <SocialButton
               label="Continue with Apple"
-              icon={<Ionicons name="lock-closed-outline" size={18} color={colors.neutral.headings} />}
+              icon={<Ionicons name="logo-apple" size={18} color={colors.neutral.headings} />}
               onPress={() => signInWith("oauth_apple")}
               compact={isCompact}
             />
@@ -139,7 +151,11 @@ export default function SignIn() {
       <VerificationModal
         visible={isVerifying}
         email={email}
-        onClose={() => setIsVerifying(false)}
+        error={codeError}
+        onClose={() => {
+          setIsVerifying(false);
+          setCodeError("");
+        }}
         onComplete={handleVerified}
       />
     </SafeAreaView>

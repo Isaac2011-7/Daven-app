@@ -1,4 +1,3 @@
-import { useStoreUser } from "@/hooks/useStoreUser";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { colors } from "@/theme";
 import { useAuth } from "@clerk/expo";
@@ -7,11 +6,13 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
-  const { isLoaded, isSignedIn, signOut } = useAuth();
-  const { status, errorMessage, convexLoading } = useStoreUser();
-  const onboardingCompleted = useOnboardingStore((state) => state.completed);
+  const { isLoaded, isSignedIn, userId, signOut } = useAuth();
+  const hasHydrated = useOnboardingStore((state) => state.hasHydrated);
+  const onboardingCompleted = useOnboardingStore((state) =>
+    userId ? state.completedUserIds.includes(userId) : false,
+  );
 
-  if (!isLoaded) {
+  if (!isLoaded || !hasHydrated) {
     return null;
   }
 
@@ -31,16 +32,6 @@ export default function Index() {
         </Text>
         <Text className="font-manrope-bold text-body-lg text-text-2 text-center mt-4">
           You&apos;re signed in. The home experience lives here next.
-        </Text>
-
-        <Text className="font-manrope-bold text-body text-text-2 text-center mt-6">
-          {status === "saved"
-            ? "✓ Saved to Convex"
-            : status === "error"
-              ? `Convex error: ${errorMessage}`
-              : convexLoading
-                ? "Connecting to Convex..."
-                : "Convex is not signed in (check the Clerk Convex integration)"}
         </Text>
 
         <TouchableOpacity onPress={() => signOut()} hitSlop={8} className="mt-8">

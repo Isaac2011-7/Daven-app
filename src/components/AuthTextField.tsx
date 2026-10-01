@@ -13,7 +13,14 @@ type AuthTextFieldProps = Omit<TextInputProps, "className" | "style"> & {
  * Boxed, always-visible-label input used across the auth screens
  * (e.g. `Email`, `Password`) — matches the Sign Up / Sign In design.
  */
-export function AuthTextField({ label, isPassword, compact, ...inputProps }: AuthTextFieldProps) {
+export function AuthTextField({
+  label,
+  isPassword,
+  compact,
+  onFocus,
+  onBlur,
+  ...inputProps
+}: AuthTextFieldProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [isSecure, setIsSecure] = useState(isPassword);
 
@@ -29,8 +36,14 @@ export function AuthTextField({ label, isPassword, compact, ...inputProps }: Aut
           {...inputProps}
           accessibilityLabel={label}
           secureTextEntry={isSecure}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          onFocus={(event) => {
+            setIsFocused(true);
+            onFocus?.(event);
+          }}
+          onBlur={(event) => {
+            setIsFocused(false);
+            onBlur?.(event);
+          }}
           placeholderTextColor={colors.neutral.disabled}
           underlineColorAndroid="transparent"
           className="flex-1 font-manrope-bold text-body-lg text-headings py-1"
