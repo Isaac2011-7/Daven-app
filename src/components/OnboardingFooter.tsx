@@ -1,3 +1,4 @@
+import { colors } from "@/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
@@ -36,7 +37,13 @@ export function OnboardingFooter({ onPress, disabled = false, showArrow = false 
           >
             CONTINUE
           </Text>
-          {showArrow && <Ionicons name="arrow-forward" size={16} color="#fff" />}
+          {showArrow && (
+            <Ionicons
+              name="arrow-forward"
+              size={16}
+              color={disabled ? colors.neutral.disabled : "#fff"}
+            />
+          )}
         </Pressable>
       </Animated.View>
     </View>

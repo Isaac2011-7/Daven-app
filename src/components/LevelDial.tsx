@@ -1,7 +1,7 @@
 import { levels } from "@/data/onboarding";
 import { colors } from "@/theme";
 import { useEffect, useMemo, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { AccessibilityActionEvent, StyleSheet, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   Extrapolation,
@@ -151,11 +151,28 @@ export function LevelDial({ value, onChange }: Props) {
     minorTicks.push((i * STEP_DEG) / (MINOR_TICKS + 1));
   }
 
+  const handleAccessibilityAction = (event: AccessibilityActionEvent) => {
+    const { actionName } = event.nativeEvent;
+    if (actionName === "increment" && value < levels.length) onChange(value + 1);
+    if (actionName === "decrement" && value > 1) onChange(value - 1);
+  };
+
   return (
     <GestureDetector gesture={pan}>
       <View
         style={[styles.container, { height }]}
         onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
+        accessible
+        accessibilityRole="adjustable"
+        accessibilityLabel="Level"
+        accessibilityValue={{
+          min: 1,
+          max: levels.length,
+          now: value,
+          text: `${current.title}, level ${value} of ${levels.length}`,
+        }}
+        accessibilityActions={[{ name: "increment" }, { name: "decrement" }]}
+        onAccessibilityAction={handleAccessibilityAction}
       >
         {width > 0 && (
           <View pointerEvents="none" style={StyleSheet.absoluteFill}>

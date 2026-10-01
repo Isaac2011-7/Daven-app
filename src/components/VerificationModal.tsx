@@ -71,7 +71,12 @@ export function VerificationModal({
         >
           <View className="bg-white rounded-t-3xl px-6 pt-4">
             <View className="flex-row justify-end">
-              <TouchableOpacity onPress={handleClose} hitSlop={8} className="p-2">
+              <TouchableOpacity
+                onPress={handleClose}
+                hitSlop={8}
+                accessibilityLabel="Close verification modal"
+                className="p-2"
+              >
                 <Ionicons name="close" size={24} color={colors.neutral.text2} />
               </TouchableOpacity>
             </View>
@@ -109,7 +114,7 @@ export function VerificationModal({
               value={code}
               onChangeText={handleChangeText}
               keyboardType="number-pad"
-              maxLength={CODE_LENGTH}
+              accessibilityLabel="Verification code"
               autoFocus
               style={styles.hiddenInput}
             />

@@ -25,7 +25,7 @@ export function OnboardingHeader({ step, showCount = false }: Props) {
 
   return (
     <View className="flex-row items-center gap-4 px-6 pt-2">
-      <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
+      <TouchableOpacity onPress={() => router.back()} hitSlop={12} accessibilityLabel="Back">
         <Ionicons name="chevron-back" size={24} color={colors.neutral.text2} />
       </TouchableOpacity>
       <View className="flex-1 h-3 rounded-full bg-border overflow-hidden">

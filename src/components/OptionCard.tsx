@@ -40,6 +40,7 @@ export function OptionCard({
     >
       <Pressable
         onPress={onPress}
+        accessibilityState={{ selected }}
         onPressIn={() => scale.set(withSpring(0.97, SPRING))}
         onPressOut={() => scale.set(withSpring(1, SPRING))}
         className={`${selected ? "option-card-selected" : "option-card"} ${className}`}

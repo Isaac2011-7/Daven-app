@@ -13,6 +13,8 @@ export function SocialButton({ label, icon, onPress, compact }: SocialButtonProp
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
       className={`relative rounded-2xl border border-border bg-white items-center justify-center ${
         compact ? "py-3" : "py-4"
       }`}

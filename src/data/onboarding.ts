@@ -1,4 +1,4 @@
-export const ONBOARDING_TOTAL_STEPS = 12;
+export const ONBOARDING_TOTAL_STEPS = 5;
 
 export type Level = {
   value: number;
