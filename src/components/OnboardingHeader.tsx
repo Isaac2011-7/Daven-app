@@ -3,7 +3,7 @@ import { colors } from "@/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useEffect } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 
 type Props = {
@@ -25,11 +25,14 @@ export function OnboardingHeader({ step, showCount = false }: Props) {
 
   return (
     <View className="flex-row items-center gap-4 px-6 pt-2">
-      <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
+      <TouchableOpacity
+        onPress={() => (router.canGoBack() ? router.back() : router.replace("/onboarding"))}
+        hitSlop={12}
+      >
         <Ionicons name="chevron-back" size={24} color={colors.neutral.text2} />
       </TouchableOpacity>
       <View className="flex-1 h-3 rounded-full bg-border overflow-hidden">
-        <Animated.View style={[styles.fill, fillStyle]} />
+        <Animated.View className="h-full rounded-full bg-feather-green" style={fillStyle} />
       </View>
       {showCount && (
         <Text className="font-manrope-extrabold text-label text-disabled">
@@ -39,11 +42,3 @@ export function OnboardingHeader({ step, showCount = false }: Props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  fill: {
-    height: "100%",
-    borderRadius: 999,
-    backgroundColor: colors.brand.featherGreen,
-  },
-});

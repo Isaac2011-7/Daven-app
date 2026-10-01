@@ -4,6 +4,11 @@ import { v } from "convex/values";
 export const addLearner = mutation({
   args: { name: v.string(), xp: v.number() },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (identity === null) {
+      throw new Error("Not authenticated");
+    }
+
     await ctx.db.insert("learners", { name: args.name, xp: args.xp });
   },
 });

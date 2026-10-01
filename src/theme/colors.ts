@@ -9,6 +9,7 @@ export const colors = {
     featherGreen: "#58CC02",
     featherGreenLip: "#58A700",
     featherGreenLight: "#E1F6D3",
+    featherGreenPale: "#D7FFB8",
     macawBlue: "#1CB0F6",
     macawBlueLip: "#1899D6",
     macawBlueLight: "#DDF1FE",
@@ -33,6 +34,7 @@ export const colors = {
     text2: "#777777",
     disabled: "#AFAFAF",
     border: "#E5E5E5",
+    divider: "#F0F0F0",
     background: "#FFFFFF",
   },
 } as const;

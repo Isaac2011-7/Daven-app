@@ -3,6 +3,7 @@ import { tokenCache } from "@clerk/expo/token-cache";
 import "../../global.css";
 
 import { convex } from "@/lib/convex";
+import { useOnboardingSync } from "@/hooks/useOnboardingSync";
 import { fontsToLoad } from "@/theme";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { useFonts } from "expo-font";
@@ -29,6 +30,11 @@ console.error = (...args: unknown[]) => {
 
 SplashScreen.preventAutoHideAsync();
 
+function AppRoutes() {
+  const onboardingReady = useOnboardingSync();
+  return onboardingReady ? <Stack screenOptions={{ headerShown: false }} /> : null;
+}
+
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts(fontsToLoad);
 
@@ -46,7 +52,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
         <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
-          <Stack screenOptions={{ headerShown: false }} />
+          <AppRoutes />
         </ConvexProviderWithClerk>
       </ClerkProvider>
     </GestureHandlerRootView>

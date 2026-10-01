@@ -1,10 +1,10 @@
 import { internal } from "./_generated/api";
-import { internalAction, internalMutation, mutation } from "./_generated/server";
+import { internalAction, internalMutation, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 /** Saves the signed-in Clerk user in the users table (once per user). */
 export const store = mutation({
-  args: { email: v.optional(v.string()), name: v.optional(v.string()) },
+  args: { name: v.optional(v.string()) },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (identity === null) {
@@ -17,7 +17,7 @@ export const store = mutation({
       .unique();
     if (existing !== null) {
       await ctx.db.patch(existing._id, {
-        email: args.email ?? existing.email,
+        email: identity.email ?? existing.email,
         name: args.name ?? existing.name,
       });
       return existing._id;
@@ -25,8 +25,69 @@ export const store = mutation({
 
     return await ctx.db.insert("users", {
       tokenIdentifier: identity.tokenIdentifier,
-      email: args.email ?? identity.email,
+      email: identity.email,
       name: args.name ?? identity.name,
+    });
+  },
+});
+
+export const getOnboarding = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (identity === null) {
+      throw new Error("Not authenticated");
+    }
+
+    const onboarding = await ctx.db
+      .query("onboarding")
+      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
+      .unique();
+
+    return {
+      userId: identity.subject,
+      answers: onboarding === null
+        ? null
+        : {
+            language: onboarding.language ?? null,
+            level: onboarding.level,
+            hebrewReading: onboarding.hebrewReading,
+            reasons: onboarding.reasons,
+            startPath: onboarding.startPath,
+            completed: onboarding.completed,
+          },
+    };
+  },
+});
+
+export const saveOnboarding = mutation({
+  args: {
+    language: v.union(v.string(), v.null()),
+    level: v.number(),
+    hebrewReading: v.union(v.string(), v.null()),
+    reasons: v.array(v.string()),
+    startPath: v.union(v.string(), v.null()),
+    completed: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (identity === null) {
+      throw new Error("Not authenticated");
+    }
+
+    const existing = await ctx.db
+      .query("onboarding")
+      .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
+      .unique();
+
+    if (existing !== null) {
+      await ctx.db.patch(existing._id, args);
+      return existing._id;
+    }
+
+    return await ctx.db.insert("onboarding", {
+      tokenIdentifier: identity.tokenIdentifier,
+      ...args,
     });
   },
 });

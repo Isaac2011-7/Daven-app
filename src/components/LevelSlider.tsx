@@ -1,7 +1,7 @@
 import { levels } from "@/data/onboarding";
 import { colors } from "@/theme";
 import { useEffect, useMemo, useState } from "react";
-import { PanResponder, Pressable, StyleSheet, Text, View } from "react-native";
+import { PanResponder, Pressable, Text, View } from "react-native";
 import Animated, {
   interpolateColor,
   useAnimatedStyle,
@@ -16,14 +16,13 @@ import Animated, {
  * dots at every level. A bar graph sits on top, one bar per stop, so the
  * level reads like a rising scale.
  */
-const TRACK_HEIGHT = 20;
+// Sizes used in calculations. The track (h-5), handle (h-11) and bar (w-9 = BAR_WIDTH)
+// sizes are written as classes in the JSX — keep them in sync.
 const HANDLE_WIDTH = 4;
-const HANDLE_HEIGHT = 44;
 const HANDLE_GAP = 6;
 const TRACK_INSET = 18; // half a bar, so the end bars and stops line up with the edges
 const STOP_SIZE = 4;
 const GRAPH_HEIGHT = 110;
-const GRAPH_GAP = 12;
 const BAR_WIDTH = 36;
 const BAR_HEIGHTS = [0.22, 0.4, 0.58, 0.78, 1]; // share of GRAPH_HEIGHT
 const SPRING = { damping: 18, stiffness: 220, mass: 0.7 };
@@ -61,8 +60,13 @@ function GraphBar({ index, value, left, onPress }: BarProps) {
   }));
 
   return (
-    <Pressable onPress={onPress} hitSlop={6} style={[styles.barSlot, { left: left - BAR_WIDTH / 2 }]}>
-      <Animated.View style={[styles.bar, barStyle]} />
+    <Pressable
+      onPress={onPress}
+      hitSlop={6}
+      className="absolute bottom-0 w-9 h-full justify-end"
+      style={{ left: left - BAR_WIDTH / 2 }}
+    >
+      <Animated.View className="w-9 rounded-[10px]" style={barStyle} />
     </Pressable>
   );
 }
@@ -129,7 +133,7 @@ export function LevelSlider({ value, onChange }: Props) {
 
   return (
     <View>
-      <View style={styles.graph}>
+      <View className="h-[116px] mb-3">
         {width > 0 &&
           levels.map((level, index) => (
             <GraphBar
@@ -143,14 +147,19 @@ export function LevelSlider({ value, onChange }: Props) {
       </View>
 
       <View
-        style={styles.hitArea}
+        className="h-11"
         onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
         {...panResponder.panHandlers}
       >
-        <Animated.View pointerEvents="none" style={[styles.track, styles.active, activeStyle]} />
         <Animated.View
           pointerEvents="none"
-          style={[styles.track, styles.inactive, inactiveStyle]}
+          className="absolute bottom-3 left-0 h-5 bg-feather-green rounded-l-[10px] rounded-r-[4px]"
+          style={activeStyle}
+        />
+        <Animated.View
+          pointerEvents="none"
+          className="absolute bottom-3 right-0 h-5 bg-feather-green-light rounded-r-[10px] rounded-l-[4px]"
+          style={inactiveStyle}
         />
 
         {levels.map((level, index) => {
@@ -159,19 +168,19 @@ export function LevelSlider({ value, onChange }: Props) {
             <View
               key={level.value}
               pointerEvents="none"
-              style={[
-                styles.stop,
-                {
-                  left: stopX(index) - STOP_SIZE / 2,
-                  backgroundColor:
-                    level.value < value ? colors.brand.featherGreenLight : colors.brand.featherGreen,
-                },
-              ]}
+              className={`absolute bottom-5 w-1 h-1 rounded-full ${
+                level.value < value ? "bg-feather-green-light" : "bg-feather-green"
+              }`}
+              style={{ left: stopX(index) - STOP_SIZE / 2 }}
             />
           );
         })}
 
-        <Animated.View pointerEvents="none" style={[styles.handle, handleStyle]} />
+        <Animated.View
+          pointerEvents="none"
+          className="absolute left-0 bottom-0 w-1 h-11 rounded-full bg-feather-green-lip"
+          style={handleStyle}
+        />
       </View>
 
       <View className="flex-row justify-between mt-1">
@@ -181,61 +190,3 @@ export function LevelSlider({ value, onChange }: Props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  graph: {
-    height: GRAPH_HEIGHT + 6,
-    marginBottom: GRAPH_GAP,
-  },
-  barSlot: {
-    position: "absolute",
-    bottom: 0,
-    width: BAR_WIDTH,
-    height: "100%",
-    justifyContent: "flex-end",
-  },
-  bar: {
-    width: BAR_WIDTH,
-    borderRadius: 10,
-  },
-  hitArea: {
-    height: HANDLE_HEIGHT,
-  },
-  track: {
-    position: "absolute",
-    bottom: (HANDLE_HEIGHT - TRACK_HEIGHT) / 2,
-    height: TRACK_HEIGHT,
-  },
-  active: {
-    left: 0,
-    backgroundColor: colors.brand.featherGreen,
-    borderTopLeftRadius: TRACK_HEIGHT / 2,
-    borderBottomLeftRadius: TRACK_HEIGHT / 2,
-    borderTopRightRadius: 4,
-    borderBottomRightRadius: 4,
-  },
-  inactive: {
-    right: 0,
-    backgroundColor: colors.brand.featherGreenLight,
-    borderTopRightRadius: TRACK_HEIGHT / 2,
-    borderBottomRightRadius: TRACK_HEIGHT / 2,
-    borderTopLeftRadius: 4,
-    borderBottomLeftRadius: 4,
-  },
-  stop: {
-    position: "absolute",
-    bottom: (HANDLE_HEIGHT - STOP_SIZE) / 2,
-    width: STOP_SIZE,
-    height: STOP_SIZE,
-    borderRadius: STOP_SIZE / 2,
-  },
-  handle: {
-    position: "absolute",
-    left: 0,
-    bottom: 0,
-    width: HANDLE_WIDTH,
-    height: HANDLE_HEIGHT,
-    borderRadius: HANDLE_WIDTH / 2,
-    backgroundColor: colors.brand.featherGreenLip,
-  },
-});

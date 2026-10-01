@@ -6,7 +6,6 @@ import {
   Modal,
   Platform,
   Pressable,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -54,8 +53,8 @@ export function VerificationModal({ visible, email, onClose, onComplete }: Verif
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
-      <View style={{ flex: 1 }}>
-        <Pressable style={StyleSheet.absoluteFill} className="bg-black/40" onPress={handleClose} />
+      <View className="flex-1">
+        <Pressable className="absolute inset-0 bg-black/40" onPress={handleClose} />
 
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -100,7 +99,7 @@ export function VerificationModal({ visible, email, onClose, onComplete }: Verif
               keyboardType="number-pad"
               maxLength={CODE_LENGTH}
               autoFocus
-              style={styles.hiddenInput}
+              className="absolute opacity-0 w-px h-px"
             />
 
           </View>
@@ -109,12 +108,3 @@ export function VerificationModal({ visible, email, onClose, onComplete }: Verif
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  hiddenInput: {
-    position: "absolute",
-    opacity: 0,
-    height: 1,
-    width: 1,
-  },
-});

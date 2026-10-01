@@ -12,4 +12,14 @@ export default defineSchema({
     name: v.optional(v.string()),
   }).index("by_token", ["tokenIdentifier"])
     .index("by_email", ["email"]),
+  onboarding: defineTable({
+    tokenIdentifier: v.string(),
+    // Optional so rows saved before language selection existed stay valid.
+    language: v.optional(v.union(v.string(), v.null())),
+    level: v.number(),
+    hebrewReading: v.union(v.string(), v.null()),
+    reasons: v.array(v.string()),
+    startPath: v.union(v.string(), v.null()),
+    completed: v.boolean(),
+  }).index("by_token", ["tokenIdentifier"]),
 });

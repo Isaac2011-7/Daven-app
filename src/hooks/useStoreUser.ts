@@ -5,27 +5,66 @@ import { useEffect, useState } from "react";
 
 export type StoreUserStatus = "waiting" | "saved" | "error";
 
+type StoreUserState = {
+  identityKey: string | null;
+  status: StoreUserStatus;
+  errorMessage: string;
+};
+
 /** Saves the signed-in user in the Convex users table after login. */
 export function useStoreUser() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const storeUser = useMutation(api.users.store);
   const { user } = useUser();
-  const email = user?.primaryEmailAddress?.emailAddress;
+  const userId = user?.id;
   const name = user?.fullName ?? undefined;
-  const [status, setStatus] = useState<StoreUserStatus>("waiting");
-  const [errorMessage, setErrorMessage] = useState("");
+  const identityKey = isAuthenticated && userId ? userId : null;
+  const [storeState, setStoreState] = useState<StoreUserState>({
+    identityKey,
+    status: "waiting",
+    errorMessage: "",
+  });
+
+  if (storeState.identityKey !== identityKey) {
+    setStoreState({ identityKey, status: "waiting", errorMessage: "" });
+  }
 
   useEffect(() => {
-    if (!isAuthenticated || !user) {
+    if (!identityKey || !userId) {
       return;
     }
-    storeUser({ email, name })
-      .then(() => setStatus("saved"))
+    let cancelled = false;
+    storeUser({ name })
+      .then(() => {
+        if (!cancelled) {
+          setStoreState((current) =>
+            current.identityKey === identityKey
+              ? { ...current, status: "saved", errorMessage: "" }
+              : current,
+          );
+        }
+      })
       .catch((err: unknown) => {
-        setStatus("error");
-        setErrorMessage(err instanceof Error ? err.message : "Could not save user.");
+        if (!cancelled) {
+          setStoreState((current) =>
+            current.identityKey === identityKey
+              ? {
+                  ...current,
+                  status: "error",
+                  errorMessage: err instanceof Error ? err.message : "Could not save user.",
+                }
+              : current,
+          );
+        }
       });
-  }, [isAuthenticated, user, email, name, storeUser]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [identityKey, userId, name, storeUser]);
+
+  const status = storeState.identityKey === identityKey ? storeState.status : "waiting";
+  const errorMessage = storeState.identityKey === identityKey ? storeState.errorMessage : "";
 
   return { status, errorMessage, convexLoading: isLoading, convexAuthenticated: isAuthenticated };
 }
