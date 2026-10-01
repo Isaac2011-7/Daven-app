@@ -15,6 +15,7 @@
   --color-macaw-blue: #1cb0f6;
   --color-macaw-blue-lip: #1899d6;
   --color-macaw-blue-light: #ddf1fe;
+  --color-macaw-blue-border: #84d8ff;
   --color-fox-orange: #ff9600;
   --color-fox-orange-lip: #e08400;
   --color-fox-orange-light: #fee7d3;
@@ -36,6 +37,8 @@
   --color-disabled: #afafaf;
   --color-border: #e5e5e5;
   --color-background: #ffffff;
+  --color-surface: #f7f7f7;
+  --color-feather-green-tint: #f4fcec;
 
   /* ---------------------------------------------------------------------
    * Font families — React Native needs a distinct font family per weight,
@@ -97,3 +100,23 @@
 @utility btn-lip-yellow {
   box-shadow: 0 4px 0 0 var(--color-bee-yellow-lip);
 }
+
+/* -------------------------------------------------------------------------
+ * Onboarding option cards - white card with a 3D gray lip, and the blue
+ * "selected" variant. Use one or the other, never both together.
+ * ------------------------------------------------------------------------- */
+@utility option-card {
+  background-color: var(--color-background);
+  border-width: 2px;
+  border-color: var(--color-border);
+  border-radius: 20px;
+  box-shadow: 0 3px 0 0 var(--color-border);
+}
+@utility option-card-selected {
+  background-color: var(--color-macaw-blue-light);
+  border-width: 2px;
+  border-color: var(--color-macaw-blue-border);
+  border-radius: 20px;
+  box-shadow: 0 3px 0 0 var(--color-macaw-blue-border);
+}
+
