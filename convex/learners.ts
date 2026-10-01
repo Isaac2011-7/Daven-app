@@ -16,6 +16,11 @@ export const addLearner = mutation({
 export const listLearners = query({
   args: {},
   handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (identity === null) {
+      throw new Error("Not authenticated");
+    }
+
     return await ctx.db.query("learners").order("desc").take(50);
   },
 });
