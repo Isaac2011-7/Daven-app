@@ -35,17 +35,19 @@ SplashScreen.preventAutoHideAsync();
 
 function AppRoutes() {
   const onboardingReady = useOnboardingSync();
+
+  // Keep the splash up until the user's saved answers have loaded.
+  useEffect(() => {
+    if (onboardingReady) {
+      SplashScreen.hideAsync();
+    }
+  }, [onboardingReady]);
+
   return onboardingReady ? <Stack screenOptions={{ headerShown: false }} /> : null;
 }
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts(fontsToLoad);
-
-  useEffect(() => {
-    if (fontsLoaded || fontError) {
-      SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded, fontError]);
 
   if (!fontsLoaded && !fontError) {
     return null;

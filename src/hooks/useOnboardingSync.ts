@@ -49,8 +49,11 @@ export function useOnboardingSync() {
       return;
     }
 
+    // Clerk can have a user while Convex is still (re)authenticating. Stay
+    // blocked until their saved answers load, so nothing overwrites them.
+    // If they already loaded, keep the app up; saving resumes after re-auth.
     if (!isAuthenticated) {
-      startTransition(() => setReady(true));
+      startTransition(() => setReady(loadedUserId.current === userId));
       return;
     }
 

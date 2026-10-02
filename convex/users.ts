@@ -92,7 +92,7 @@ export const saveOnboarding = mutation({
   },
 });
 
-/** Deletes the users rows for an email. Called by removeByEmail. */
+/** Deletes the users rows (and their onboarding answers) for an email. Called by removeByEmail. */
 export const deleteRowsByEmail = internalMutation({
   args: { email: v.string() },
   handler: async (ctx, args) => {
@@ -101,6 +101,13 @@ export const deleteRowsByEmail = internalMutation({
       .withIndex("by_email", (q) => q.eq("email", args.email))
       .collect();
     for (const row of rows) {
+      const onboardingRows = await ctx.db
+        .query("onboarding")
+        .withIndex("by_token", (q) => q.eq("tokenIdentifier", row.tokenIdentifier))
+        .collect();
+      for (const onboarding of onboardingRows) {
+        await ctx.db.delete(onboarding._id);
+      }
       await ctx.db.delete(row._id);
     }
     return rows.length;

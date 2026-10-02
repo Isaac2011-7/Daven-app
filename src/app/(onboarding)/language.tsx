@@ -21,7 +21,7 @@ export default function LanguageScreen() {
       return;
     }
     setLanguage(selected);
-    router.replace("/");
+    router.push("/level");
   };
 
   return (

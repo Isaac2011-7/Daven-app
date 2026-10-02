@@ -67,8 +67,10 @@ Convex is an intentional, approved part of this app. It is not
 * `src/lib/convex.ts` creates the client; `src/app/_layout.tsx` wraps the
   app in `ConvexProviderWithClerk`.
 * User data that should follow the user across devices (onboarding
-  answers, selected language, and later XP and lesson progress) is saved
-  in Convex and loaded into Zustand by `src/hooks/useOnboardingSync.ts`.
+  answers and selected language) is saved in Convex and loaded into
+  Zustand by `src/hooks/useOnboardingSync.ts`. That hook only syncs
+  onboarding answers. XP and lesson progress are still mock data in
+  `src/data/progress.ts` and will need their own Convex sync.
 * Zustand is the in-memory copy the UI reads from. Do not replace the
   Convex sync with AsyncStorage-only persistence.
 
@@ -494,7 +496,7 @@ Do not build custom auth.
 
 ## Lesson Content Rules
 
-Use hardcoded JSON/TS for lessons in `data/`.
+Use hardcoded JSON/TS for lessons in `src/data/`.
 Lesson content itself is not stored in Convex; only per-user data is.
 
 ---
@@ -537,7 +539,7 @@ Explain what changed and how to test.
 
 Use:
 
-* JSON/TS in `data/` for lesson content
+* JSON/TS in `src/data/` for lesson content
 * Zustand for client state
 * Convex for saving user data (see "Backend: Convex")
 * backend only for secure operations

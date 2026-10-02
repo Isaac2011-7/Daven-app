@@ -1,14 +1,14 @@
-import { mutation, query } from "./_generated/server";
+import { internalMutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
-export const addLearner = mutation({
+/**
+ * Adds a sample learner row. Internal so the app can't write arbitrary names
+ * or XP; run it from the CLI or dashboard. Real XP will come from server-side
+ * lesson progress once that exists.
+ */
+export const addLearner = internalMutation({
   args: { name: v.string(), xp: v.number() },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (identity === null) {
-      throw new Error("Not authenticated");
-    }
-
     await ctx.db.insert("learners", { name: args.name, xp: args.xp });
   },
 });

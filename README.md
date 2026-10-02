@@ -20,6 +20,8 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
    Set `EXPO_PUBLIC_CONVEX_URL` too. Running `npx convex dev` fills it in for you and keeps the backend in `convex/` deployed while you work.
 
+   In the [Convex dashboard](https://dashboard.convex.dev) (**Settings → Environment Variables**), set `CLERK_JWT_ISSUER_DOMAIN` to your Clerk Frontend API URL (Clerk Dashboard → **API keys**, e.g. `https://your-app.clerk.accounts.dev`). Convex uses it to verify Clerk sign-ins; without it every query and mutation fails with "Not authenticated".
+
 3. Start the app
 
    ```bash

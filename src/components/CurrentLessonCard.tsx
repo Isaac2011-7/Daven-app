@@ -47,6 +47,7 @@ export function CurrentLessonCard({ lesson, lessonNumber, totalLessons, complete
       <TouchableOpacity
         activeOpacity={0.85}
         onPress={onStart}
+        accessibilityRole="button"
         className="mt-3 h-12 items-center justify-center rounded-2xl bg-white btn-lip-gray"
       >
         <Text className="font-manrope-extrabold text-[15px] tracking-label text-feather-green">
