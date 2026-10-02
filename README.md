@@ -10,7 +10,17 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npm install
    ```
 
-2. Start the app
+2. Add your environment variables
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+   Set `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` in `.env.local` to the publishable key from the [Clerk Dashboard](https://dashboard.clerk.com) (**API keys** page); the app will not start without it.
+
+   Set `EXPO_PUBLIC_CONVEX_URL` too. Running `npx convex dev` fills it in for you and keeps the backend in `convex/` deployed while you work.
+
+3. Start the app
 
    ```bash
    npx expo start

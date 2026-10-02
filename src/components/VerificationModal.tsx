@@ -17,6 +17,7 @@ const CODE_LENGTH = 6;
 type VerificationModalProps = {
   visible: boolean;
   email: string;
+  error?: string;
   onClose: () => void;
   onComplete: (code: string) => void;
 };
@@ -26,7 +27,13 @@ type VerificationModalProps = {
  * A single hidden TextInput drives the digit boxes so we get the numeric
  * keypad and native paste support without juggling focus across 6 inputs.
  */
-export function VerificationModal({ visible, email, onClose, onComplete }: VerificationModalProps) {
+export function VerificationModal({
+  visible,
+  email,
+  error,
+  onClose,
+  onComplete,
+}: VerificationModalProps) {
   const [code, setCode] = useState("");
   const inputRef = useRef<TextInput>(null);
 
@@ -63,7 +70,12 @@ export function VerificationModal({ visible, email, onClose, onComplete }: Verif
         >
           <View className="bg-white rounded-t-3xl px-6 pt-4">
             <View className="flex-row justify-end">
-              <TouchableOpacity onPress={handleClose} hitSlop={8} className="p-2">
+              <TouchableOpacity
+                onPress={handleClose}
+                hitSlop={8}
+                accessibilityLabel="Close verification modal"
+                className="p-2"
+              >
                 <Ionicons name="close" size={24} color={colors.neutral.text2} />
               </TouchableOpacity>
             </View>
@@ -92,12 +104,16 @@ export function VerificationModal({ visible, email, onClose, onComplete }: Verif
               ))}
             </Pressable>
 
+            {error ? (
+              <Text className="font-manrope-bold text-caption text-error text-center mt-4">{error}</Text>
+            ) : null}
+
             <TextInput
               ref={inputRef}
               value={code}
               onChangeText={handleChangeText}
               keyboardType="number-pad"
-              maxLength={CODE_LENGTH}
+              accessibilityLabel="Verification code"
               autoFocus
               className="absolute opacity-0 w-px h-px"
             />

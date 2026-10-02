@@ -1,7 +1,7 @@
 import { levels } from "@/data/onboarding";
 import { colors } from "@/theme";
 import { useEffect, useMemo, useState } from "react";
-import { Text, View } from "react-native";
+import { type AccessibilityActionEvent, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   Extrapolation,
@@ -35,6 +35,7 @@ const READOUT_SPACE = 110; // room under the arc for the level name
 const SNAP_SPRING = { damping: 20, stiffness: 120, mass: 0.9 }; // soft glide, tiny settle
 const MOMENTUM = 0.18; // seconds of flick velocity projected forward, like an iOS picker
 const RUBBER = 0.35; // how much the wheel stretches past the first/last level
+const TOUCH_SLOP = 10; // px a finger moves before the wheel claims (or gives up) the drag
 const lastIndex = levels.length - 1;
 
 type Props = {
@@ -110,6 +111,8 @@ export function LevelDial({ value, onChange }: Props) {
   const pan = useMemo(
     () =>
       Gesture.Pan()
+        .activeOffsetX([-TOUCH_SLOP, TOUCH_SLOP])
+        .failOffsetY([-TOUCH_SLOP, TOUCH_SLOP])
         .onBegin(() => {
           dragging.set(true);
           startOffset.set(offset.get());
@@ -127,11 +130,11 @@ export function LevelDial({ value, onChange }: Props) {
             scheduleOnRN(onChange, level);
           }
         })
-        .onFinalize((event) => {
+        .onFinalize((event, success) => {
           dragging.set(false);
           // Project the flick forward, then settle on the nearest level,
           // carrying the finger's speed into the spring so there's no jolt.
-          const velocity = -event.velocityX / pxPerStep;
+          const velocity = success ? -event.velocityX / pxPerStep : 0;
           const projected = offset.get() + velocity * MOMENTUM;
           const target = Math.min(Math.max(Math.round(projected), 0), lastIndex);
           offset.set(withSpring(target, { ...SNAP_SPRING, velocity }));
@@ -154,12 +157,29 @@ export function LevelDial({ value, onChange }: Props) {
     minorTicks.push((i * STEP_DEG) / (MINOR_TICKS + 1));
   }
 
+  const handleAccessibilityAction = (event: AccessibilityActionEvent) => {
+    const { actionName } = event.nativeEvent;
+    if (actionName === "increment" && value < levels.length) onChange(value + 1);
+    if (actionName === "decrement" && value > 1) onChange(value - 1);
+  };
+
   return (
     <GestureDetector gesture={pan}>
       <View
         className="w-full overflow-hidden"
         style={{ height }}
         onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
+        accessible
+        accessibilityRole="adjustable"
+        accessibilityLabel="Level"
+        accessibilityValue={{
+          min: 1,
+          max: levels.length,
+          now: value,
+          text: `${current.title}, level ${value} of ${levels.length}`,
+        }}
+        accessibilityActions={[{ name: "increment" }, { name: "decrement" }]}
+        onAccessibilityAction={handleAccessibilityAction}
       >
         {width > 0 && (
           <View pointerEvents="none" className="absolute inset-0">

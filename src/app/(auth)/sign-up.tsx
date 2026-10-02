@@ -19,37 +19,47 @@ export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [codeError, setCodeError] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSignUp = async () => {
+    if (isSubmitting) return;
     if (!email.trim() || !password) {
       setError("Enter your email and password to continue.");
       return;
     }
     setError("");
-    const { error: createError } = await signUp.password({
-      emailAddress: email.trim(),
-      password,
-    });
-    if (createError) {
-      setError(createError.longMessage ?? createError.message);
-      return;
+    setIsSubmitting(true);
+    try {
+      const { error: createError } = await signUp.password({
+        emailAddress: email.trim(),
+        password,
+      });
+      if (createError) {
+        setError(createError.longMessage ?? createError.message);
+        return;
+      }
+      const { error: sendError } = await signUp.verifications.sendEmailCode();
+      if (sendError) {
+        setError(sendError.longMessage ?? sendError.message);
+        return;
+      }
+      setCodeError("");
+      setIsVerifying(true);
+    } finally {
+      setIsSubmitting(false);
     }
-    const { error: sendError } = await signUp.verifications.sendEmailCode();
-    if (sendError) {
-      setError(sendError.longMessage ?? sendError.message);
-      return;
-    }
-    setIsVerifying(true);
   };
 
   const handleVerified = async (code: string) => {
-    setIsVerifying(false);
+    setCodeError("");
     const { error: verifyError } = await signUp.verifications.verifyEmailCode({ code });
     if (verifyError) {
-      setError(verifyError.longMessage ?? verifyError.message);
+      setCodeError(verifyError.longMessage ?? verifyError.message);
       return;
     }
+    setIsVerifying(false);
     if (signUp.status !== "complete") {
       setError(
         `Sign-up is not complete (${signUp.status}). Missing: ${signUp.missingFields.join(", ") || "none"}. Unverified: ${signUp.unverifiedFields.join(", ") || "none"}.`,
@@ -73,6 +83,7 @@ export default function SignUp() {
         <View className="flex-1 px-8">
           <TouchableOpacity
             onPress={() => (router.canGoBack() ? router.back() : router.replace("/onboarding"))}
+            accessibilityLabel="Go back"
             hitSlop={8}
             className={`self-start ${isCompact ? "py-2" : "py-4"}`}
           >
@@ -114,9 +125,10 @@ export default function SignUp() {
           <TouchableOpacity
             activeOpacity={0.85}
             onPress={handleSignUp}
+            disabled={isSubmitting}
             className={`bg-feather-green btn-lip-green rounded-2xl items-center ${
               isCompact ? "py-3 mt-4" : "py-4 mt-6"
-            }`}
+            } ${isSubmitting ? "opacity-60" : ""}`}
           >
             <Text className="font-manrope-extrabold text-label tracking-label text-white">SIGN UP</Text>
           </TouchableOpacity>
@@ -142,7 +154,7 @@ export default function SignUp() {
             />
             <SocialButton
               label="Continue with Apple"
-              icon={<Ionicons name="lock-closed-outline" size={18} color={colors.neutral.headings} />}
+              icon={<Ionicons name="logo-apple" size={18} color={colors.neutral.headings} />}
               onPress={() => signInWith("oauth_apple")}
               compact={isCompact}
             />
@@ -164,7 +176,11 @@ export default function SignUp() {
       <VerificationModal
         visible={isVerifying}
         email={email}
-        onClose={() => setIsVerifying(false)}
+        error={codeError}
+        onClose={() => {
+          setIsVerifying(false);
+          setCodeError("");
+        }}
         onComplete={handleVerified}
       />
     </SafeAreaView>

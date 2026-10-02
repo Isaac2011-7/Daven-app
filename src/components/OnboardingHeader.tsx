@@ -28,6 +28,7 @@ export function OnboardingHeader({ step, showCount = false }: Props) {
       <TouchableOpacity
         onPress={() => (router.canGoBack() ? router.back() : router.replace("/onboarding"))}
         hitSlop={12}
+        accessibilityLabel="Back"
       >
         <Ionicons name="chevron-back" size={24} color={colors.neutral.text2} />
       </TouchableOpacity>

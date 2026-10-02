@@ -10,6 +10,7 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY ?? "";
@@ -20,13 +21,15 @@ if (!publishableKey) {
 
 // On web, Clerk logs this as an error when its bot check falls back to the
 // invisible widget. It is harmless, but Expo's dev overlay covers the screen.
-const originalConsoleError = console.error;
-console.error = (...args: unknown[]) => {
-  if (typeof args[0] === "string" && args[0].includes("Smart CAPTCHA widget")) {
-    return;
-  }
-  originalConsoleError(...args);
-};
+if (Platform.OS === "web" && __DEV__) {
+  const originalConsoleError = console.error;
+  console.error = (...args: unknown[]) => {
+    if (typeof args[0] === "string" && args[0].includes("Smart CAPTCHA widget")) {
+      return;
+    }
+    originalConsoleError(...args);
+  };
+}
 
 SplashScreen.preventAutoHideAsync();
 
