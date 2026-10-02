@@ -1,53 +1,51 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
 
 type OnboardingState = {
+  language: string | null;
   level: number;
   hebrewReading: string | null;
   reasons: string[];
   startPath: string | null;
-  completedUserIds: string[];
-  hasHydrated: boolean;
+  completed: boolean;
+  setLanguage: (id: string) => void;
+  clearLanguage: () => void;
   setLevel: (level: number) => void;
   setHebrewReading: (id: string) => void;
   toggleReason: (id: string) => void;
   setStartPath: (id: string) => void;
-  complete: (userId: string) => void;
-  setHasHydrated: (hasHydrated: boolean) => void;
+  complete: () => void;
+  restore: (answers: OnboardingAnswers) => void;
+  reset: () => void;
 };
 
-export const useOnboardingStore = create<OnboardingState>()(
-  persist(
-    (set) => ({
-      level: 3,
-      hebrewReading: null,
-      reasons: [],
-      startPath: "shema",
-      completedUserIds: [],
-      hasHydrated: false,
-      setLevel: (level) => set({ level }),
-      setHebrewReading: (id) => set({ hebrewReading: id }),
-      toggleReason: (id) =>
-        set((state) => ({
-          reasons: state.reasons.includes(id)
-            ? state.reasons.filter((reason) => reason !== id)
-            : [...state.reasons, id],
-        })),
-      setStartPath: (id) => set({ startPath: id }),
-      complete: (userId) =>
-        set((state) => ({
-          completedUserIds: state.completedUserIds.includes(userId)
-            ? state.completedUserIds
-            : [...state.completedUserIds, userId],
-        })),
-      setHasHydrated: (hasHydrated) => set({ hasHydrated }),
-    }),
-    {
-      name: "onboarding",
-      storage: createJSONStorage(() => AsyncStorage),
-      partialize: (state) => ({ completedUserIds: state.completedUserIds }),
-      onRehydrateStorage: (state) => () => state.setHasHydrated(true),
-    },
-  ),
-);
+export type OnboardingAnswers = Pick<
+  OnboardingState,
+  "language" | "level" | "hebrewReading" | "reasons" | "startPath" | "completed"
+>;
+
+const initialAnswers: OnboardingAnswers = {
+  language: null,
+  level: 3,
+  hebrewReading: null,
+  reasons: [],
+  startPath: "shema",
+  completed: false,
+};
+
+export const useOnboardingStore = create<OnboardingState>((set) => ({
+  ...initialAnswers,
+  setLanguage: (id) => set({ language: id }),
+  clearLanguage: () => set({ language: null }),
+  setLevel: (level) => set({ level }),
+  setHebrewReading: (id) => set({ hebrewReading: id }),
+  toggleReason: (id) =>
+    set((state) => ({
+      reasons: state.reasons.includes(id)
+        ? state.reasons.filter((reason) => reason !== id)
+        : [...state.reasons, id],
+    })),
+  setStartPath: (id) => set({ startPath: id }),
+  complete: () => set({ completed: true }),
+  restore: (answers) => set(answers),
+  reset: () => set(initialAnswers),
+}));

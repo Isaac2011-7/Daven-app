@@ -82,7 +82,7 @@ export default function SignUp() {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
         <View className="flex-1 px-8">
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={() => (router.canGoBack() ? router.back() : router.replace("/onboarding"))}
             accessibilityLabel="Go back"
             hitSlop={8}
             className={`self-start ${isCompact ? "py-2" : "py-4"}`}

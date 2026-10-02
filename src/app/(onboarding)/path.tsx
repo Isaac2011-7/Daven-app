@@ -5,19 +5,17 @@ import { OptionCard } from "@/components/OptionCard";
 import { startPaths } from "@/data/onboarding";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { colors } from "@/theme";
-import { useAuth } from "@clerk/expo";
 import { router } from "expo-router";
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Path() {
-  const { userId } = useAuth();
   const startPath = useOnboardingStore((state) => state.startPath);
   const setStartPath = useOnboardingStore((state) => state.setStartPath);
   const complete = useOnboardingStore((state) => state.complete);
 
   const handleContinue = () => {
-    if (userId) complete(userId);
+    complete();
     router.replace("/");
   };
 

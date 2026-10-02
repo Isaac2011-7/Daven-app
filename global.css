@@ -39,6 +39,8 @@
   --color-background: #ffffff;
   --color-surface: #f7f7f7;
   --color-feather-green-tint: #f4fcec;
+  --color-feather-green-pale: #d7ffb8; /* "Done" badge */
+  --color-divider: #f0f0f0; /* List separators */
 
   /* ---------------------------------------------------------------------
    * Font families — React Native needs a distinct font family per weight,
@@ -99,6 +101,10 @@
 }
 @utility btn-lip-yellow {
   box-shadow: 0 4px 0 0 var(--color-bee-yellow-lip);
+}
+/* For white buttons, e.g. START LESSON on the green lesson card */
+@utility btn-lip-gray {
+  box-shadow: 0 4px 0 0 var(--color-border);
 }
 
 /* -------------------------------------------------------------------------

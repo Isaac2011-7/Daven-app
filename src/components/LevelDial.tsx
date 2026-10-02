@@ -1,7 +1,7 @@
 import { levels } from "@/data/onboarding";
 import { colors } from "@/theme";
 import { useEffect, useMemo, useState } from "react";
-import { AccessibilityActionEvent, StyleSheet, Text, View } from "react-native";
+import { type AccessibilityActionEvent, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   Extrapolation,
@@ -26,6 +26,7 @@ import { scheduleOnRN } from "react-native-worklets";
 const WHEEL_SCALE = 1.5; // wheel diameter relative to the screen width
 const STEP_DEG = 30; // angle between two levels on the wheel
 const STEP_RAD = (STEP_DEG * Math.PI) / 180;
+// BAND, TOP_PAD and MARKER are also written as classes below (border-[76px], top-2, w-[62px]/h-[62px]) — keep them in sync.
 const BAND = 76; // thickness of the rim the numbers sit on
 const TOP_PAD = 8;
 const MARKER = 62;
@@ -70,8 +71,13 @@ function WheelNumber({ index, radius, offset }: WheelNumberProps) {
   });
 
   return (
-    <View style={[styles.numberSlot, polar(radius, radius - BAND / 2, index * STEP_DEG, MARKER)]}>
-      <Animated.Text style={[styles.number, textStyle]}>{index + 1}</Animated.Text>
+    <View
+      className="absolute w-[62px] h-[62px] items-center justify-center"
+      style={polar(radius, radius - BAND / 2, index * STEP_DEG, MARKER)}
+    >
+      <Animated.Text className="font-manrope-extrabold text-[30px]" style={textStyle}>
+        {index + 1}
+      </Animated.Text>
     </View>
   );
 }
@@ -160,7 +166,8 @@ export function LevelDial({ value, onChange }: Props) {
   return (
     <GestureDetector gesture={pan}>
       <View
-        style={[styles.container, { height }]}
+        className="w-full overflow-hidden"
+        style={{ height }}
         onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
         accessible
         accessibilityRole="adjustable"
@@ -175,41 +182,36 @@ export function LevelDial({ value, onChange }: Props) {
         onAccessibilityAction={handleAccessibilityAction}
       >
         {width > 0 && (
-          <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+          <View pointerEvents="none" className="absolute inset-0">
             {/* Static rim */}
             <View
-              style={[
-                styles.rim,
-                { width: diameter, height: diameter, borderRadius: radius, left: wheelLeft },
-              ]}
+              className="absolute top-2 border-[76px] border-feather-green-light"
+              style={{ width: diameter, height: diameter, borderRadius: radius, left: wheelLeft }}
             />
 
             {/* Fixed marker at the top of the rim */}
             <View
-              style={[
-                styles.marker,
-                { left: width / 2 - MARKER / 2, top: TOP_PAD + (BAND - MARKER) / 2 },
-              ]}
+              className="absolute w-[62px] h-[62px] rounded-full bg-feather-green btn-lip-green"
+              style={{ left: width / 2 - MARKER / 2, top: TOP_PAD + (BAND - MARKER) / 2 }}
             />
 
             {/* Turning wheel: numbers and ticks */}
             <Animated.View
-              style={[
-                styles.wheel,
-                { width: diameter, height: diameter, left: wheelLeft },
-                wheelStyle,
-              ]}
+              className="absolute top-2"
+              style={[{ width: diameter, height: diameter, left: wheelLeft }, wheelStyle]}
             >
               {minorTicks.map((angle) => (
                 <View
                   key={angle}
-                  style={[styles.minorTick, polar(radius, radius - BAND - 10, angle, 0)]}
+                  className="absolute w-0.5 h-2 -ml-px -mt-1 rounded-[1px] bg-border"
+                  style={polar(radius, radius - BAND - 10, angle, 0)}
                 />
               ))}
               {levels.map((level, index) => (
                 <View
                   key={`major-${level.value}`}
-                  style={[styles.majorTick, polar(radius, radius - BAND - 12, index * STEP_DEG, 0)]}
+                  className="absolute w-[3px] h-3.5 -ml-[1.5px] -mt-[7px] rounded-[2px] bg-disabled"
+                  style={polar(radius, radius - BAND - 12, index * STEP_DEG, 0)}
                 />
               ))}
               {levels.map((level, index) => (
@@ -218,12 +220,12 @@ export function LevelDial({ value, onChange }: Props) {
             </Animated.View>
 
             {/* Level name, under the arc */}
-            <View style={styles.readout}>
+            <View className="absolute left-6 right-6 bottom-2 items-center">
               <Animated.View
                 key={value}
                 entering={FadeIn.duration(180)}
                 exiting={FadeOut.duration(120)}
-                style={styles.readoutInner}
+                className="items-center"
               >
                 <Text className="font-manrope-extrabold text-label tracking-label text-feather-green">
                   LEVEL {current.value} OF {levels.length}
@@ -243,67 +245,3 @@ export function LevelDial({ value, onChange }: Props) {
     </GestureDetector>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-    overflow: "hidden",
-  },
-  rim: {
-    position: "absolute",
-    top: TOP_PAD,
-    borderWidth: BAND,
-    borderColor: colors.brand.featherGreenLight,
-  },
-  marker: {
-    position: "absolute",
-    width: MARKER,
-    height: MARKER,
-    borderRadius: MARKER / 2,
-    backgroundColor: colors.brand.featherGreen,
-    boxShadow: `0px 4px 0px 0px ${colors.brand.featherGreenLip}`,
-  },
-  wheel: {
-    position: "absolute",
-    top: TOP_PAD,
-  },
-  numberSlot: {
-    position: "absolute",
-    width: MARKER,
-    height: MARKER,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  number: {
-    fontFamily: "Manrope_800ExtraBold",
-    fontSize: 30,
-  },
-  minorTick: {
-    position: "absolute",
-    width: 2,
-    height: 8,
-    marginLeft: -1,
-    marginTop: -4,
-    borderRadius: 1,
-    backgroundColor: colors.neutral.border,
-  },
-  majorTick: {
-    position: "absolute",
-    width: 3,
-    height: 14,
-    marginLeft: -1.5,
-    marginTop: -7,
-    borderRadius: 2,
-    backgroundColor: colors.neutral.disabled,
-  },
-  readout: {
-    position: "absolute",
-    left: 24,
-    right: 24,
-    bottom: 8,
-    alignItems: "center",
-  },
-  readoutInner: {
-    alignItems: "center",
-  },
-});

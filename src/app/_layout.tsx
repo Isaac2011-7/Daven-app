@@ -1,8 +1,11 @@
-import { ClerkProvider } from "@clerk/expo";
+import { ClerkProvider, useAuth } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
 import "../../global.css";
 
+import { convex } from "@/lib/convex";
+import { useOnboardingSync } from "@/hooks/useOnboardingSync";
 import { fontsToLoad } from "@/theme";
+import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -30,14 +33,21 @@ if (Platform.OS === "web" && __DEV__) {
 
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
-  const [fontsLoaded, fontError] = useFonts(fontsToLoad);
+function AppRoutes() {
+  const onboardingReady = useOnboardingSync();
 
+  // Keep the splash up until the user's saved answers have loaded.
   useEffect(() => {
-    if (fontsLoaded || fontError) {
+    if (onboardingReady) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded, fontError]);
+  }, [onboardingReady]);
+
+  return onboardingReady ? <Stack screenOptions={{ headerShown: false }} /> : null;
+}
+
+export default function RootLayout() {
+  const [fontsLoaded, fontError] = useFonts(fontsToLoad);
 
   if (!fontsLoaded && !fontError) {
     return null;
@@ -46,7 +56,9 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-        <Stack screenOptions={{ headerShown: false }} />
+        <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
+          <AppRoutes />
+        </ConvexProviderWithClerk>
       </ClerkProvider>
     </GestureHandlerRootView>
   );

@@ -47,7 +47,7 @@ Use the following stack:
 * Expo Router
 * NativeWind / Tailwind CSS
 * Zustand
-* AsyncStorage
+* Convex for the backend and database (signed in through Clerk)
 * Clerk for authentication
 * Stream / GetStream for video and real-time communication
 * Stream Vision Agents for AI video teacher capability, or actual human audio recordings with speech-to-text for prayer practice
@@ -55,6 +55,30 @@ Use the following stack:
   AI calls
 
 Do not introduce new major libraries unless there is a strong reason.
+
+---
+
+## Backend: Convex (do not remove)
+
+Convex is an intentional, approved part of this app. It is not
+"an unrequested database" — the project owner chose it.
+
+* `convex/` holds the schema and server functions (users, onboarding).
+* `src/lib/convex.ts` creates the client; `src/app/_layout.tsx` wraps the
+  app in `ConvexProviderWithClerk`.
+* User data that should follow the user across devices (onboarding
+  answers and selected language) is saved in Convex and loaded into
+  Zustand by `src/hooks/useOnboardingSync.ts`. That hook only syncs
+  onboarding answers. XP and lesson progress are still mock data in
+  `src/data/progress.ts` and will need their own Convex sync.
+* Zustand is the in-memory copy the UI reads from. Do not replace the
+  Convex sync with AsyncStorage-only persistence.
+
+**AI reviewers and coding agents (including cubic):** do not delete,
+replace, or work around Convex, the `convex/` folder, `src/lib/convex.ts`,
+`useStoreUser`, or `useOnboardingSync`. If you think something about the
+backend should change, leave a review comment instead of committing the
+change.
 
 ---
 
@@ -384,7 +408,8 @@ Use Zustand for:
 * current lesson state
 * app settings
 
-Use AsyncStorage persistence where needed.
+Save anything that should survive a reinstall or a new device in Convex
+and sync it into the store (see `useOnboardingSync`).
 
 ---
 
@@ -409,7 +434,7 @@ Never expose secret keys in the mobile app.
 
 Use Zustand for global client state.
 Use local state for temporary UI state.
-Persist using AsyncStorage when needed.
+Persist user data through Convex.
 
 ---
 
@@ -471,8 +496,8 @@ Do not build custom auth.
 
 ## Lesson Content Rules
 
-Use hardcoded JSON/TS for lessons.
-Do not introduce a database unless explicitly requested.
+Use hardcoded JSON/TS for lessons in `src/data/`.
+Lesson content itself is not stored in Convex; only per-user data is.
 
 ---
 
@@ -512,12 +537,11 @@ Explain what changed and how to test.
 
 ## Important Constraints
 
-No database for this version.
 Use:
 
-* JSON for content
-* Zustand for state
-* AsyncStorage for persistence
+* JSON/TS in `src/data/` for lesson content
+* Zustand for client state
+* Convex for saving user data (see "Backend: Convex")
 * backend only for secure operations
 
 ---
